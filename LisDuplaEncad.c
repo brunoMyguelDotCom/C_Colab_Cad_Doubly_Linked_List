@@ -10,6 +10,7 @@ usando #ifdef para verificar o sistema operacional onde esta sendo compilado
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Cor de terminal e verificacao de SO para gotoxy, incluindo o windows.h caso seja win
 #ifdef _WIN32
@@ -43,9 +44,8 @@ void limpa_Tela(){
 	#endif
 }
     
-    
-// tela inicial
-void tela() {
+// moldura
+void moldura() {
 	limpa_Tela();
     int i;
 
@@ -76,7 +76,7 @@ void tela() {
 }
 
 // Funcao da Tela de Cliente
-void tela_funcionarios() {
+void tela_Cadastro() {
     gotoxy(10, 7);
     printf("1 - Codigo.........: ");
     gotoxy(10, 9);
@@ -152,11 +152,20 @@ typedef struct {
 } Lista;
 
 //funcoes (req NAO funcionais)
+
+// remove '\n' de string
+void removeNovaLinha(char *str) {
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+}
+
 void inicializaLista(Lista *L){
 	// cria item vazio
 	L->primeiro = (Apontador) malloc (sizeof(Item));
 
-	// sempre trabalhar com L-> Ultimo, pois o objeto ja esta sendo apontado por ele
+	// sempre trabalhar com L-> Ultimo, pois o objeto ja inicia apontado por ele
 	L->ultimo = L->primeiro;
 
 	// aterra item
@@ -164,16 +173,136 @@ void inicializaLista(Lista *L){
 	L->primeiro->proximo = NULL;
 }
 
+// retorna os inputs dentro de um registro de funcionario
+reg_funcionarios* inputCadastro(){ 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// fazer If para colocar encima o tipo de cadastro que esta sendo feito
+
+
+
+
+
+
+
+
+
+
+	
+	reg_funcionarios *reg = (reg_funcionarios *) malloc(sizeof(reg_funcionarios));
+	
+	// chama tela para pedir input
+	tela_Cadastro();
+
+	gotoxy(31, 7);
+	scanf("%d", &reg->codigo);
+	
+    gotoxy(31, 9);
+    fgets(reg->nome, sizeof(reg->nome), stdin);
+    removeNovaLinha(reg->nome);
+
+    gotoxy(31, 11);
+    fgets(reg->endereco, sizeof(reg->endereco), stdin);
+    removeNovaLinha(reg->endereco);
+
+    gotoxy(31, 13);
+    fgets(reg->cargo, sizeof(reg->cargo), stdin);
+    removeNovaLinha(reg->cargo);
+
+    gotoxy(31, 15);
+    fgets(reg->dt_admissao, sizeof(reg->dt_admissao), stdin);
+    removeNovaLinha(reg->dt_admissao);
+
+    gotoxy(31, 17);
+    fgets(reg->telefone, sizeof(reg->telefone), stdin);
+    removeNovaLinha(reg->telefone);
+
+    gotoxy(31, 19);
+	scanf("%f", &reg->salario);
+
+	return reg;
+}
 
 //funcoes (req funcionais)
-void CadFuncFinList(Lista *L, reg_funcionarios Reg){
-	printf("teste");
+void CadFuncFinList(Lista *L){
 	
+	// cria item vazio
+	Item *itemAtual = (Item *) malloc(sizeof(Item));
+
+	// cria um ponteiro de conteudo vazio para copiar
+	reg_funcionarios *temp = (reg_funcionarios *) malloc(sizeof(reg_funcionarios));
+	temp = inputCadastro();
+
+	// copia para o item
+	itemAtual->conteudo = *temp;
+
+	// libera
+	free(temp);
+
+	// verifica se a lista possui item
+	if (L->primeiro == NULL)
+	{	
+		L->primeiro = itemAtual;
+		L->ultimo = L->primeiro;
+	
+		itemAtual->anterior = NULL;
+		itemAtual->proximo = NULL;
+	} else{
+
+		// aterra o proximo
+		itemAtual->proximo = NULL;
+
+		// liga o penultimo no ultimo e vice versa
+		L->ultimo->proximo = itemAtual;
+		itemAtual->anterior = L->ultimo;
+		
+		// aponta pro "novo ultimo"
+		L->ultimo = itemAtual;
+	}
 };
 
-void CadFuncIniList(){
+void CadFuncIniList(Lista *L){
 	
-	printf("Cadastro ini!");
+	// cria item vazio
+	Item *itemAtual = (Item *) malloc(sizeof(Item));
+
+	// cria um ponteiro de conteudo vazio para copiar
+	reg_funcionarios *temp = (reg_funcionarios *) malloc(sizeof(reg_funcionarios));
+	temp = inputCadastro();
+
+	// copia para o item
+	itemAtual->conteudo = *temp;
+
+	// libera
+	free(temp);
+
+	// verifica se a lista possui item
+	if (L->primeiro == NULL)
+	{	
+		L->primeiro = itemAtual;
+		L->ultimo = L->primeiro;
+	
+		itemAtual->anterior = NULL;
+		itemAtual->proximo = NULL;
+	} else{
+
+		// aterra o anterior
+		itemAtual->anterior = NULL;
+
+		// liga o segundo no primeiro e vice versa
+		itemAtual->proximo = L->primeiro;
+		L->primeiro->anterior = itemAtual;
+
+		// aponta para "novo primeiro"
+		L->primeiro = itemAtual;
+	}
 };
 
 void CadFuncMidList(){
@@ -213,11 +342,10 @@ int main(){
     // variaveis
 	int resp = -1;
 	Lista L;
-	
-	//inicializaL(&L);
+	inicializaLista(&L);
 	
 	// chamadas iniciais de telas
-	tela();		
+	moldura();		
 	tela_menu();
 
 	// loop do software
@@ -229,11 +357,11 @@ int main(){
 		limpa_msg();
 		switch (resp){
 			case 1:
-				//CadFuncFinList(L);
+				CadFuncFinList(&L);
 				break;
 			
 			case 2:
-				CadFuncIniList();
+				CadFuncIniList(&L);
 				break;
 			
 			case 3: 

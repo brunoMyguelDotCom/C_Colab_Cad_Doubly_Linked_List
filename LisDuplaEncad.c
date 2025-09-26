@@ -22,7 +22,6 @@ void corTerminal(void){
 void gotoxy(int x, int y) {
     COORD pos = {x - 1, y - 1};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-	printf("ESTAMOS NO WINDOWS MEUS CAROS");
 }
 #else
 
@@ -32,8 +31,6 @@ void corTerminal(void){
 
 void gotoxy(int x, int y) {
     printf("\033[%d;%dH", y, x); // gotoxy adaptado para linux e Macos
-	printf("ESTAMOS EM ALGO MEUS CAROS");
-
 }
 #endif
 
@@ -211,7 +208,69 @@ void Consulta(){
 
 
 int main(){
-	gotoxy(1,1);
+    corTerminal();
+
+    // variaveis
+	int resp = -1;
+	Lista L;
+	
+	//inicializaL(&L);
+	
+	// chamadas iniciais de telas
+	tela();		
+	tela_menu();
+
+	// loop do software
+	 do{
+		gotoxy(7, 23);
+		printf("Digite uma opcao: ");
+		scanf("%d",&resp);
+		
+		limpa_msg();
+		switch (resp){
+			case 1:
+				//CadFuncFinList(L);
+				break;
+			
+			case 2:
+				CadFuncIniList();
+				break;
+			
+			case 3: 
+				CadFuncMidList();
+				break;
+			
+			case 4:
+				RemFuncFinList();
+				break;
+			
+			case 5:
+				RemFuncIniList();
+				break;
+				
+			case 6:
+				RemFuncMidList();
+				break;
+			
+			case 7: 
+				AltFunc();
+				break;
+			
+			case 8:
+				Consulta();
+				break;
+			
+			case 9:
+				limpa_Tela();
+				return 0;
+				break;
+			
+			default:
+				gotoxy(7, 23);
+				printf("Valor invalido, digite novamente!");
+				
+		}
+	} while(resp != -1);
 	
 	return 0;
 }

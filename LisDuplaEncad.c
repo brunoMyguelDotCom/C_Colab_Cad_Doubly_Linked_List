@@ -2,26 +2,56 @@
 Autor: Bruno Myguel
 Data: 23/09/25
 
-Objetivo: CRUD com lista duplamente encadeada.
+Objetivo: CRUD cadastro clientes com lista duplamente encadeada.
+
+OBSERVACAO: Esse codigo foi feito em Macos, porem, com funcoes e verificacoes de sistema operacional para rodar em sistemas distintos.
+usando #ifdef para verificar o sistema operacional onde esta sendo compilado
 */
 
 #include <stdio.h>
 #include <stdlib.h>
+
+// Cor de terminal e verificacao de SO para gotoxy, incluindo o windows.h caso seja win
+#ifdef _WIN32
 #include <windows.h>
 
-// func posicao cursor
-void gotoxy(int x, int y) {
-    COORD coord;
-    coord.X = x - 1;
-    coord.Y = y - 1;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+void corTerminal(void){
+    system("color 02"); // cor do terminal (VERDE)
 }
 
+void gotoxy(int x, int y) {
+    COORD pos = {x - 1, y - 1};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+	printf("ESTAMOS NO WINDOWS MEUS CAROS");
+}
+#else
+
+void corTerminal(void){
+    printf("\033[40;32m"); // cor do terminal (VERDE)
+}
+
+void gotoxy(int x, int y) {
+    printf("\033[%d;%dH", y, x); // gotoxy adaptado para linux e Macos
+	printf("ESTAMOS EM ALGO MEUS CAROS");
+
+}
+#endif
+
+// funcao que substitui o sys(cls), verificando o sistema operacional antes de executar
+void limpa_Tela(){
+	#ifdef _WIN32
+		system("cls");
+	#else
+		system("clear");
+	#endif
+}
+    
+    
 // tela inicial
 void tela() {
-    system("cls");
-    system("color 0c");
+	limpa_Tela();
     int i;
+
     for (i = 1; i < 25; i++) {
         gotoxy(1, i);
         printf("|");
@@ -139,7 +169,7 @@ void inicializaLista(Lista *L){
 
 
 //funcoes (req funcionais)
-void CadFuncFinList(Lista *L, reg_funcionarios register){
+void CadFuncFinList(Lista *L, reg_funcionarios Reg){
 	printf("teste");
 	
 };
@@ -176,76 +206,12 @@ void AltFunc(){
 
 void Consulta(){
 	
-	printf("Consulta!");
+    printf("Consulta!");
 };
 
 
-
 int main(){
-	
-	// variaveis
-	int resp = -1;
-	Lista L;
-	
-
-	// inicializacao lista
-	inicializaL(&L);
-	
-	// chamadas iniciais de telas
-	tela();		
-	tela_menu();
-
-	// loop do software
-	do{
-		gotoxy(7, 23);
-		printf("Digite uma opcao: ");
-		scanf("%d",&resp);
-		
-		limpa_msg();
-		switch (resp){
-			case 1:
-				//CadFuncFinList(L);
-				break;
-			
-			case 2:
-				CadFuncIniList();
-				break;
-			
-			case 3: 
-				CadFuncMidList();
-				break;
-			
-			case 4:
-				RemFuncFinList();
-				break;
-			
-			case 5:
-				RemFuncIniList();
-				break;
-				
-			case 6:
-				RemFuncMidList();
-				break;
-			
-			case 7: 
-				AltFunc();
-				break;
-			
-			case 8:
-				Consulta();
-				break;
-			
-			case 9:
-				system("cls");
-				return 0;
-				break;
-			
-			default:
-				gotoxy(7, 23);
-				printf("Valor invalido, digite novamente!");
-				
-		}
-	} while(resp != -1);
+	gotoxy(1,1);
 	
 	return 0;
 }

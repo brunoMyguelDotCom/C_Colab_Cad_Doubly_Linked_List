@@ -43,6 +43,20 @@ void limpa_Tela(){
 		system("clear");
 	#endif
 }
+
+// funcao de pausa
+#ifdef _WIN32
+void pausa() {
+    system("pause");
+}
+#else
+void pausa() {
+    gotoxy(7, 23);
+    printf("Pressione ENTER para continuar...");
+    getchar();
+    getchar();
+}
+#endif
     
 // moldura
 void moldura() {
@@ -77,6 +91,9 @@ void moldura() {
 
 // Funcao da Tela de Cliente
 void tela_Cadastro() {
+
+	moldura();
+
     gotoxy(10, 7);
     printf("1 - Codigo.........: ");
     gotoxy(10, 9);
@@ -95,6 +112,8 @@ void tela_Cadastro() {
 
 // tela inicial
 void tela_menu(){
+	moldura();
+
 	gotoxy(27, 5);
 	printf("GERENCIAMENTO FUNCIONARIOS");
 	
@@ -120,7 +139,7 @@ void tela_menu(){
 
 // Funcao que limpa a Linha de Mensagem
 void limpa_msg() {
-    gotoxy(07, 23);
+    gotoxy(7, 23);
     printf("                                                                 ");
 }
 
@@ -162,15 +181,9 @@ void removeNovaLinha(char *str) {
 }
 
 void inicializaLista(Lista *L){
-	// cria item vazio
-	L->primeiro = (Apontador) malloc (sizeof(Item));
-
-	// sempre trabalhar com L-> Ultimo, pois o objeto ja inicia apontado por ele
-	L->ultimo = L->primeiro;
-
-	// aterra item
-	L->primeiro->anterior = NULL;
-	L->primeiro->proximo = NULL;
+	
+	L->primeiro = NULL;
+    L->ultimo = NULL;
 }
 
 // retorna os inputs dentro de um registro de funcionario
@@ -203,6 +216,7 @@ reg_funcionarios* inputCadastro(){
 
 	gotoxy(31, 7);
 	scanf("%d", &reg->codigo);
+	getchar();
 	
     gotoxy(31, 9);
     fgets(reg->nome, sizeof(reg->nome), stdin);
@@ -220,6 +234,8 @@ reg_funcionarios* inputCadastro(){
     fgets(reg->dt_admissao, sizeof(reg->dt_admissao), stdin);
     removeNovaLinha(reg->dt_admissao);
 
+	getchar();
+
     gotoxy(31, 17);
     fgets(reg->telefone, sizeof(reg->telefone), stdin);
     removeNovaLinha(reg->telefone);
@@ -230,15 +246,46 @@ reg_funcionarios* inputCadastro(){
 	return reg;
 }
 
+
+void exibirDados(Item *itemE){
+	tela_Cadastro();
+
+    gotoxy(31, 7);
+    printf("%d", itemE->conteudo.codigo);
+    
+    gotoxy(31, 9);
+    printf("%s", itemE->conteudo.nome);
+
+    gotoxy(31, 11);
+    printf("%s", itemE->conteudo.endereco);
+
+    gotoxy(31, 13);
+    printf("%s", itemE->conteudo.cargo);
+
+    gotoxy(31, 15);
+    printf("%s", itemE->conteudo.dt_admissao);
+
+    gotoxy(31, 17);
+    printf("%s", itemE->conteudo.telefone);
+
+    gotoxy(31, 19);
+    printf("%.2f", itemE->conteudo.salario);
+
+    gotoxy(7, 23);
+    printf("Pressione ENTER para voltar...");
+
+	pausa();
+}
+
 //funcoes (req funcionais)
 void CadFuncFinList(Lista *L){
 	
 	// cria item vazio
 	Item *itemAtual = (Item *) malloc(sizeof(Item));
 
-	// cria um ponteiro de conteudo vazio para copiar
-	reg_funcionarios *temp = (reg_funcionarios *) malloc(sizeof(reg_funcionarios));
-	temp = inputCadastro();
+	// cria um ponteiro de conteudo para copiar
+	reg_funcionarios *temp = inputCadastro();
+
 
 	// copia para o item
 	itemAtual->conteudo = *temp;
@@ -273,9 +320,8 @@ void CadFuncIniList(Lista *L){
 	// cria item vazio
 	Item *itemAtual = (Item *) malloc(sizeof(Item));
 
-	// cria um ponteiro de conteudo vazio para copiar
-	reg_funcionarios *temp = (reg_funcionarios *) malloc(sizeof(reg_funcionarios));
-	temp = inputCadastro();
+	// cria um ponteiro de conteudo para copiar
+	reg_funcionarios *temp = inputCadastro();
 
 	// copia para o item
 	itemAtual->conteudo = *temp;
@@ -344,12 +390,13 @@ int main(){
 	Lista L;
 	inicializaLista(&L);
 	
-	// chamadas iniciais de telas
-	moldura();		
-	tela_menu();
+	
 
 	// loop do software
 	 do{
+		// chamadas iniciais de telas
+		tela_menu();
+	
 		gotoxy(7, 23);
 		printf("Digite uma opcao: ");
 		scanf("%d",&resp);
@@ -365,7 +412,12 @@ int main(){
 				break;
 			
 			case 3: 
-				CadFuncMidList();
+				if (L.primeiro != NULL) {
+					exibirDados(L.primeiro);
+				} else {
+					gotoxy(7, 23);
+					printf("Lista vazia! Cadastre um funcionario primeiro.");
+				}
 				break;
 			
 			case 4:
@@ -389,15 +441,14 @@ int main(){
 				break;
 			
 			case 9:
-				limpa_Tela();
 				return 0;
-				break;
 			
 			default:
 				gotoxy(7, 23);
 				printf("Valor invalido, digite novamente!");
 				
 		}
+
 	} while(resp != -1);
 	
 	return 0;
